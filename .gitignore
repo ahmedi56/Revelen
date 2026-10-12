@@ -3,3 +3,5 @@ dist/
 labs/*.exe
 rea-*.txt
 rea-*.json
+
+.commandcode/

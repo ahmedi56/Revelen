@@ -74,6 +74,28 @@ claude mcp add revelen -- node C:\path\to\Revelen\dist\index.js
 
 Then ask: *"Using Revelen, search the level1_strings lab for text and explain what you find."*
 
+## Claude Code plugin
+
+The repository is also a Claude Code plugin. It starts Revelen for you (through `npx`) and adds two skills:
+
+| Skill | What it does |
+|---|---|
+| `reverse-engineer` | Leads an investigation of a lab one step at a time: clues, one function, one question |
+| `explain-simply` | Explains any instruction or idea with an everyday analogy and small steps |
+
+```text
+/plugin marketplace add ahmedi56/Revelen
+/plugin install revelen@revelen
+```
+
+Then ask: *"Help me reverse engineer the level1_strings lab."*
+
+When Revelen runs through `npx` it lives in a temporary folder, so keep your built labs in a folder of your own and point `REVELEN_LABS_DIR` at it:
+
+```powershell
+[Environment]::SetEnvironmentVariable("REVELEN_LABS_DIR", "C:\path\to\Revelen\labs", "User")
+```
+
 ## Project anatomy
 
 ```
@@ -84,13 +106,16 @@ src/tutor/concepts.ts   🎓 instruction explanations
 src/labs.ts             🚪 only opens programs inside labs/
 labs/                   🏋️ practice programs (source only; build them yourself)
 test/                   ✅ smoke tests with a fake REA + optimizer tests
+.claude-plugin/         🔌 plugin manifest + marketplace entry
+skills/                 📚 the two teaching skills (plain Markdown)
 ```
 
 ## Roadmap
 
 - [ ] Guided lessons with quizzes and saved progress
 - [ ] More labs (logic branches, simple encodings)
-- [ ] `npx revelen` package
+- [x] `npx revelen` package
+- [x] Claude Code plugin with two skills
 
 ## Responsible use
 

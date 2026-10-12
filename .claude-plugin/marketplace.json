@@ -1,0 +1,11 @@
+{
+  "name": "revelen",
+  "owner": { "name": "ahmedi56" },
+  "plugins": [
+    {
+      "name": "revelen",
+      "source": "./",
+      "description": "Learn reverse engineering step by step on Revelen's practice labs."
+    }
+  ]
+}
