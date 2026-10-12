@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // 1. Import what we need.
 import { McpServer } from "@modelcontextprotocol/server";
 import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
