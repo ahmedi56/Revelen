@@ -14,7 +14,7 @@ import { compactFunction } from "./optimizer/compact.js";
 const clues: Record<string, Record<string, string>> = {};
 
 // 2. Create the server with a name and version (Claude sees these).
-const server = new McpServer({ name: "revelen", version: "0.2.0" });
+const server = new McpServer({ name: "revelen", version: "0.2.2" });
 
 // A small helper: turns any error into a polite tool answer instead of a crash.
 function errorResult(err: unknown) {
