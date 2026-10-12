@@ -44,6 +44,36 @@ export const CONCEPTS: Record<string, Concept> = {
     analogy: "Like putting a bookmark in your book before reading a footnote.",
     example: "call check_password",
   },
+  test: {
+    name: "TEST",
+    short: "Checks bits of two values (a bitwise AND) and keeps only the flags. 'test eax, eax' is the classic way to ask 'is eax zero?'.",
+    analogy: "Like shaking a box to hear if anything is inside, without opening it.",
+    example: "call strcmp\ntest eax, eax   ; did strcmp return 0 (strings equal)?",
+  },
+  setz: {
+    name: "SETZ / SETE",
+    short: "Stores 1 in a byte if the last comparison was equal (zero flag set), otherwise 0. A jump-free way to turn a comparison into true/false.",
+    analogy: "Like ticking a checkbox instead of walking to a different room.",
+    example: "test eax, eax\nsetz al         ; al = 1 if eax was 0, else 0",
+  },
+  lea: {
+    name: "LEA",
+    short: "'Load Effective Address': computes an ADDRESS and stores it, without reading what's there. Often loads a pointer to a string.",
+    analogy: "Like writing down a house's address instead of going inside.",
+    example: "lea rdx, [0x140005050]   ; rdx = address of the secret string",
+  },
+  push: {
+    name: "PUSH",
+    short: "Puts a value on top of the stack (a pile of saved values in memory).",
+    analogy: "Like putting a plate on top of a pile of plates.",
+    example: "push rbp   ; save rbp so we can restore it later",
+  },
+  pop: {
+    name: "POP",
+    short: "Takes the top value off the stack and puts it in a register. The opposite of PUSH.",
+    analogy: "Like taking the top plate off the pile.",
+    example: "pop rbp    ; restore the rbp we saved with push",
+  },
   ret: {
     name: "RET",
     short: "Leaves the current function and goes back to the saved return address.",
