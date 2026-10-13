@@ -5,6 +5,17 @@ import { Client } from "@modelcontextprotocol/client";
 import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+
+// The plugin manifest must carry the same version as the npm package,
+// otherwise Claude Code doesn't notice that the plugin was updated.
+const readJson = (file) => JSON.parse(readFileSync(new URL(file, import.meta.url), "utf8"));
+assert.equal(
+  readJson("../.claude-plugin/plugin.json").version,
+  readJson("../package.json").version,
+  "Set the same version in .claude-plugin/plugin.json and package.json"
+);
+console.log("✓ plugin.json and package.json versions match");
 
 const env = { ...process.env };
 if (!process.env.REVELEN_REAL_REA) {

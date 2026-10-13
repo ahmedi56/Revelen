@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // 1. Import what we need.
+import { readFileSync } from "node:fs";
 import { McpServer } from "@modelcontextprotocol/server";
 import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
 import * as z from "zod/v4";
@@ -15,7 +16,9 @@ import { compactFunction } from "./optimizer/compact.js";
 const clues: Record<string, Record<string, string>> = {};
 
 // 2. Create the server with a name and version (Claude sees these).
-const server = new McpServer({ name: "revelen", version: "0.2.2" });
+// The version is read from package.json, so there is only one place to change it.
+const { version } = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+const server = new McpServer({ name: "revelen", version });
 
 // A small helper: turns any error into a polite tool answer instead of a crash.
 function errorResult(err: unknown) {
