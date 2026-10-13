@@ -5,7 +5,8 @@ import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
 import * as z from "zod/v4";
 // ".js" even though the file is .ts: we write the name it will have AFTER compiling.
 import { CONCEPTS } from "./tutor/concepts.js";
-import { searchStrings, readInstructions } from "./bridge/rea.js";
+import { searchStrings, readInstructions, ReaError, explainReaError } from "./bridge/rea.js";
+import { checkSetup } from "./doctor.js";
 import { labPath } from "./labs.js";
 import { compactFunction } from "./optimizer/compact.js";
 
@@ -18,7 +19,8 @@ const server = new McpServer({ name: "revelen", version: "0.2.2" });
 
 // A small helper: turns any error into a polite tool answer instead of a crash.
 function errorResult(err: unknown) {
-  const message = err instanceof Error ? err.message : String(err);
+  const message =
+    err instanceof ReaError ? explainReaError(err) : err instanceof Error ? err.message : String(err);
   return { content: [{ type: "text" as const, text: `⚠️ ${message}` }], isError: true };
 }
 
@@ -128,7 +130,26 @@ server.registerTool(
   }
 );
 
-// 6. Connect to Claude through stdin/stdout.
+// 6. Tool #4: the doctor. Checks that every program Revelen depends on is ready.
+server.registerTool(
+  "revelen_check_setup",
+  {
+    description:
+      "Check that everything Revelen needs is installed (Node, REA, Ghidra, Java, GCC, built labs) " +
+      "and list the exact fix for anything missing. " +
+      "Use this when another Revelen tool fails, or when the learner is setting Revelen up.",
+    inputSchema: z.object({}),
+  },
+  async () => {
+    try {
+      return { content: [{ type: "text", text: checkSetup() }] };
+    } catch (err) {
+      return errorResult(err);
+    }
+  }
+);
+
+// 7. Connect to Claude through stdin/stdout.
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);

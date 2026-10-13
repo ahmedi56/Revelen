@@ -18,8 +18,13 @@ const text = (r) => r.content[0].text;
 const call = (name, args) => client.callTool({ name, arguments: args });
 
 const tools = (await client.listTools()).tools.map((t) => t.name).sort();
-assert.deepEqual(tools, ["revelen_explain_concept", "revelen_find_strings", "revelen_show_function"]);
-console.log("✓ 3 tools listed");
+assert.deepEqual(tools, ["revelen_check_setup", "revelen_explain_concept", "revelen_find_strings", "revelen_show_function"]);
+console.log("✓ 4 tools listed");
+
+const setup = text(await call("revelen_check_setup", {}));
+assert.match(setup, /Revelen setup check: \d+ of \d+ ready/);
+assert.match(setup, /✅ Node\.js/);
+console.log("✓ check_setup reports each part");
 
 assert.match(text(await call("revelen_explain_concept", { concept: "SETZ" })), /SETZ/);
 console.log("✓ explain_concept knows SETZ");

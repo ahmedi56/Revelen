@@ -44,6 +44,6 @@ programs outside Revelen's labs.
   learner already found. Point them out: "you have seen this address before".
 - If a tool says a lab isn't built yet, show the learner the exact `gcc`
   command from the error and wait until they have run it.
-- If a tool fails for another reason, say what failed in plain words and
-  suggest running `rea doctor`.
+- If a tool fails for another reason, call `revelen_check_setup`, then walk
+  the learner through the first ❌ line only. One fix at a time.
 - For explanations, follow the `explain-simply` skill.

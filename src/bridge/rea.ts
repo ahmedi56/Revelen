@@ -18,6 +18,33 @@ export class ReaError extends Error {
   }
 }
 
+// Turns a ReaError into words a beginner can act on. The raw message is kept
+// at the end, in case someone more experienced is helping.
+export function explainReaError(err: ReaError): string {
+  switch (err.code) {
+    case "rea_missing":
+      return err.message;
+    case "timeout":
+      return (
+        "The analysis took too long and was stopped. Ghidra is slow the first time it opens a program, " +
+        "so try once more. If it happens again, run the revelen_check_setup tool."
+      );
+    case "spawn_failed":
+    case "bad_output":
+      return (
+        "Revelen got no usable answer from REA, the tool that drives Ghidra. " +
+        "That usually means part of the setup is missing. Run the revelen_check_setup tool to see which part.\n" +
+        `(Details: ${err.message})`
+      );
+    default:
+      return (
+        `REA couldn't do that: ${err.message}\n` +
+        `If you asked for a function, check its name (try "main" first). ` +
+        "If nothing works on this lab, run the revelen_check_setup tool."
+      );
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Step 1: find REA's real JavaScript file.
 //

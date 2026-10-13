@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 // so one folder up is always the project root.
 const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 // The lab sources (.c) always ship with Revelen.
-const SOURCES_DIR = path.join(PROJECT_ROOT, "labs");
+export const SOURCES_DIR = path.join(PROJECT_ROOT, "labs");
 // The built programs (.exe) live next to them, unless REVELEN_LABS_DIR points elsewhere.
 // Needed when Revelen runs from npx: its own folder is a temporary cache.
 export const LABS_DIR = process.env.REVELEN_LABS_DIR

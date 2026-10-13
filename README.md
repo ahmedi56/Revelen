@@ -23,6 +23,7 @@ Claude / Cursor ──► Revelen (MCP) ──► REA ──► Ghidra ──►
 | `revelen_explain_concept` | Explains an assembly instruction (MOV, CMP, TEST, SETZ, LEA, JZ…) with an analogy and example |
 | `revelen_find_strings` | Searches the text stored inside a lab program and shows where it lives |
 | `revelen_show_function` | Shows one function's assembly, compacted and labelled with clues you've found |
+| `revelen_check_setup` | Checks Node, REA, Ghidra, Java, GCC and the labs, and gives the exact fix for anything missing |
 
 ## Token savings
 
