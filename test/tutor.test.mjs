@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import { CONCEPTS, findConcept } from "../dist/tutor/concepts.js";
 import { LESSONS } from "../dist/tutor/lessons.js";
 import { QUIZZES } from "../dist/tutor/quizzes.js";
+import { STORIES } from "../dist/tutor/stories.js";
 
 test("every quiz tests a real lesson card and has a valid answer", () => {
   for (const quiz of QUIZZES) {
@@ -26,6 +27,24 @@ test("every lab in the course has its source file", () => {
     const source = fileURLToPath(new URL(`../labs/${lesson.lab}.c`, import.meta.url));
     assert.ok(existsSync(source), `${lesson.lab}.c is missing from labs/`);
     assert.match(lesson.answerHash, /^[0-9a-f]{64}$/);
+  }
+});
+
+test("every story belongs to a lab and every step asks one question", () => {
+  for (const story of STORIES) {
+    assert.ok(LESSONS.some((lesson) => lesson.lab === story.lab), `story for unknown lab "${story.lab}"`);
+    assert.ok(story.steps.length > 0 && story.fix && story.realNames && story.words.length > 0);
+    for (const step of story.steps) {
+      assert.ok(step.say && step.ask && step.goodAnswer, `${story.lab}: "${step.title}" is incomplete`);
+      // Machine code and memory addresses may only appear in the optional "deeper" part.
+      assert.doesNotMatch(step.say + step.ask + (step.show ?? ""), /\b(MOV|MOVZX|CMP|LEA|CALL)\b|0x14[0-9a-f]{4,}/);
+    }
+  }
+});
+
+test("every lab has a story", () => {
+  for (const lesson of LESSONS) {
+    assert.ok(STORIES.some((story) => story.lab === lesson.lab), `${lesson.lab} has no story`);
   }
 });
 

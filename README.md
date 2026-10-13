@@ -24,6 +24,7 @@ Claude / Cursor ──► Revelen (MCP) ──► REA ──► Ghidra ──►
 | `revelen_find_strings` | Searches the text stored inside a lab program and shows where it lives |
 | `revelen_show_function` | Shows one function's assembly, compacted and labelled with clues you've found |
 | `revelen_check_setup` | Checks Node, REA, Ghidra, Java, GCC and the labs, and gives the exact fix for anything missing |
+| `revelen_story` | Teaches a lab as a real-life security story in plain words, one step at a time. Instant, with no machine code unless you ask |
 | `revelen_progress` | Lists the labs in order, what you have solved, and what to do next |
 | `revelen_check_solution` | Checks the password, PIN or word you found, without ever revealing the answer |
 | `revelen_quiz` / `revelen_answer_quiz` | Asks one multiple-choice question on an instruction and checks your choice |

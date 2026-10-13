@@ -1,6 +1,6 @@
 {
   "name": "revelen",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Learn reverse engineering step by step, through MCP",
   "type": "module",
   "main": "dist/index.js",

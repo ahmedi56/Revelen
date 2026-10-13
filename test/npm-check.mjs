@@ -3,7 +3,9 @@
 // Run from the Revelen folder:  node test/npm-check.mjs
 import { Client } from "@modelcontextprotocol/client";
 import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
+import { mkdtempSync } from "node:fs";
 import os from "node:os";
+import path from "node:path";
 
 const isWindows = process.platform === "win32";
 console.log("Downloading and starting revelen from npm (can take 30s the first time)...");
@@ -16,6 +18,8 @@ await client.connect(
     args: isWindows ? ["/c", "npx", "-y", "revelen@latest"] : ["-y", "revelen@latest"],
     // Start in the home folder so npx doesn't pick up the local Revelen project.
     cwd: os.homedir(),
+    // Keep this check out of the learner's real diary (~/.revelen/progress.json).
+    env: { ...process.env, REVELEN_HOME: mkdtempSync(path.join(os.tmpdir(), "revelen-check-")) },
   })
 );
 

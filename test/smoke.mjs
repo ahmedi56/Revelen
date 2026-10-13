@@ -41,8 +41,24 @@ assert.deepEqual(tools, [
   "revelen_progress",
   "revelen_quiz",
   "revelen_show_function",
+  "revelen_story",
 ]);
-console.log("✓ 8 tools listed");
+console.log("✓ 9 tools listed");
+
+const situation = text(await call("revelen_story", { lab: "level1_strings" }));
+assert.match(situation, /5 steps/);
+assert.doesNotMatch(situation, /revelen-rocks/); // the situation must not give the secret away
+const firstStep = text(await call("revelen_story", { lab: "level1_strings", step: 1 }));
+assert.match(firstStep, /STEP 1 of 5/);
+assert.match(firstStep, /level1_strings\.exe/);
+assert.doesNotMatch(firstStep, /MOV|0x14/); // plain words: no machine code in a normal step
+assert.match(text(await call("revelen_story", { lab: "level1_strings", step: 5 })), /FINISH WITH THE FIX/);
+assert.equal((await call("revelen_story", { lab: "level1_strings", step: 9 })).isError, true);
+assert.match(situation, /NEW WORDS IN THIS LEVEL/);
+assert.match(text(await call("revelen_story", { lab: "intro" })), /WHAT IS REVERSE ENGINEERING/);
+assert.match(text(await call("revelen_story", { lab: "level4_xor", step: 6 })), /REAL NAMES/);
+assert.equal((await call("revelen_story", { lab: "no_such_lab" })).isError, true);
+console.log("✓ story: intro, new words, steps in plain words, the fix and the real names");
 
 const setup = text(await call("revelen_check_setup", {}));
 assert.match(setup, /Revelen setup check: \d+ of \d+ ready/);

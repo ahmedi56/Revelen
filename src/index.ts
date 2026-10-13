@@ -8,6 +8,7 @@ import * as z from "zod/v4";
 import { CONCEPTS, findConcept } from "./tutor/concepts.js";
 import { LESSONS, findLesson, isRightAnswer } from "./tutor/lessons.js";
 import { QUIZZES, findQuiz } from "./tutor/quizzes.js";
+import { INTRO, STORIES, findStory } from "./tutor/stories.js";
 import { loadProgress, remember } from "./progress.js";
 import { searchStrings, readInstructions, ReaError, explainReaError } from "./bridge/rea.js";
 import { checkSetup } from "./doctor.js";
@@ -90,7 +91,13 @@ server.registerTool(
         return { content: [{ type: "text", text: `No text containing "${text}" in ${lab}. Try a shorter or different word.` }] };
       }
       // Compact output: one line per match instead of REA's 80 lines of metadata.
-      const lines = found.map((s) => `${s.address}  "${s.value}"`).join("\n");
+      // A short search word can match hundreds of texts, so only the first ones are shown.
+      const MAX_SHOWN = 30;
+      const lines =
+        found.slice(0, MAX_SHOWN).map((s) => `${s.address}  "${s.value}"`).join("\n") +
+        (found.length > MAX_SHOWN
+          ? `\n...and ${found.length - MAX_SHOWN} more. Search for a longer word to see fewer, closer matches.`
+          : "");
       // Remember each clue so show_function can label these addresses later.
       clues[lab] ??= {};
       for (const s of found) clues[lab][s.address] = `string "${s.value}"`;
@@ -290,7 +297,75 @@ server.registerTool(
   }
 );
 
-// 11. Connect to Claude through stdin/stdout.
+// 11. Tool #9: a lab told as a story, one step at a time, in plain words.
+// Everything was recorded in advance, so this answers at once and needs no Ghidra.
+server.registerTool(
+  "revelen_story",
+  {
+    description:
+      "Teach a Revelen lab as a real-life security story in plain words, one step at a time. " +
+      "This is the default way to teach a lab to a beginner: it is instant and shows no machine code. " +
+      "Call it without a step to get the situation and the new words, then with step 1, 2, 3... one per turn. " +
+      "For a learner who is completely new, call it first with lab 'intro': what reverse engineering is and what they will be able to do.",
+    inputSchema: z.object({
+      lab: z.string().describe("Lab name, e.g. 'level1_strings', or 'intro' for the introduction"),
+      step: z.number().int().min(0).optional().describe("0 or left out = the situation. 1, 2, 3... = that step."),
+    }),
+  },
+  async ({ lab, step = 0 }) => {
+    // "intro" is the page before the first level: what reverse engineering is and what the words mean.
+    if (lab.trim().toLowerCase() === "intro") {
+      return { content: [{ type: "text", text: `TELL THIS TO A NEW LEARNER, a part at a time, in your own simple words:\n\n${INTRO}` }] };
+    }
+    const story = findStory(lab);
+    if (!story) {
+      const known = STORIES.map((s) => s.lab).join(", ");
+      return {
+        content: [{ type: "text", text: `There is no story for "${lab}" yet. Stories exist for: ${known}. Use the other Revelen tools for this lab.` }],
+        isError: true,
+      };
+    }
+
+    if (step === 0) {
+      const text =
+        `STORY: ${story.title} (${story.steps.length} steps)\n\n` +
+        `THE SITUATION (tell it to the learner):\n${story.situation}\n\n` +
+        `NEW WORDS IN THIS LEVEL (explain them before step 1, so none of them comes as a surprise):\n` +
+        story.words.map((w) => `- ${w.word}: ${w.meaning}`).join("\n");
+      return { content: [{ type: "text", text }] };
+    }
+
+    const current = story.steps[step - 1];
+    if (!current) {
+      return {
+        content: [{ type: "text", text: `This story has ${story.steps.length} steps, so there is no step ${step}.` }],
+        isError: true,
+      };
+    }
+
+    const parts = [`STEP ${step} of ${story.steps.length}: ${current.title}`, `SAY:\n${current.say}`];
+    if (current.run) {
+      // Give the exact command, or say how to build the program if it isn't there yet.
+      try {
+        parts.push(`THE LEARNER RUNS THIS:\n${labPath(lab)}`);
+      } catch (err) {
+        parts.push(`THE PROGRAM IS NOT BUILT YET. ${err instanceof Error ? err.message : ""}`);
+      }
+    }
+    if (current.show) parts.push(`SHOW EXACTLY THIS:\n${current.show}`);
+    parts.push(`ASK:\n${current.ask}`);
+    parts.push(`A GOOD ANSWER (for you only, never read it out):\n${current.goodAnswer}`);
+    if (current.deeper) parts.push(`ONLY IF THE LEARNER ASKS HOW IT WORKS INSIDE:\n${current.deeper}`);
+    if (step === story.steps.length) {
+      parts.push(`AFTER THEIR ANSWER, FINISH WITH THE FIX:\n${story.fix}`);
+      parts.push(`THEN CONNECT IT TO THE REAL NAMES, so the learner knows what they did:\n${story.realNames}`);
+    }
+
+    return { content: [{ type: "text", text: parts.join("\n\n") }] };
+  }
+);
+
+// 12. Connect to Claude through stdin/stdout.
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
