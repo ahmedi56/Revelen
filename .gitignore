@@ -5,3 +5,4 @@ rea-*.txt
 rea-*.json
 
 .commandcode/
+.claude/

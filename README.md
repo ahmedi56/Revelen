@@ -24,6 +24,20 @@ Claude / Cursor ──► Revelen (MCP) ──► REA ──► Ghidra ──►
 | `revelen_find_strings` | Searches the text stored inside a lab program and shows where it lives |
 | `revelen_show_function` | Shows one function's assembly, compacted and labelled with clues you've found |
 | `revelen_check_setup` | Checks Node, REA, Ghidra, Java, GCC and the labs, and gives the exact fix for anything missing |
+| `revelen_progress` | Lists the labs in order, what you have solved, and what to do next |
+| `revelen_check_solution` | Checks the password, PIN or word you found, without ever revealing the answer |
+| `revelen_quiz` / `revelen_answer_quiz` | Asks one multiple-choice question on an instruction and checks your choice |
+
+## Labs
+
+| Lab | What you hunt | The new idea |
+|---|---|---|
+| `level1_strings` | A password | Text in the code is stored as readable text in the `.exe` |
+| `level2_pin` | A PIN | A number hides inside an instruction, written in hexadecimal |
+| `level3_letters` | A word | Letters are numbers (ASCII), so a word can hide as a row of numbers |
+| `level4_xor` | A word | XOR scrambles with a key, and the same XOR undoes it |
+
+Your progress (labs solved, lesson cards read, quiz questions passed) is saved in `.revelen\progress.json` in your home folder.
 
 ## Token savings
 
@@ -56,6 +70,9 @@ cd Revelen
 npm install
 npm run build
 gcc labs\level1_strings.c -o labs\level1_strings.exe
+gcc labs\level2_pin.c -o labs\level2_pin.exe
+gcc labs\level3_letters.c -o labs\level3_letters.exe
+gcc labs\level4_xor.c -o labs\level4_xor.exe
 npm test
 ```
 
@@ -104,6 +121,10 @@ src/index.ts            🧠 MCP server: the tools Claude can call
 src/bridge/rea.ts       ✋ runs REA as a child process, parses its JSON
 src/optimizer/compact.ts 🫁 compacts output without dropping logic
 src/tutor/concepts.ts   🎓 instruction explanations
+src/tutor/lessons.ts    🗺️ the labs in order, with answer fingerprints (never the answers)
+src/tutor/quizzes.ts    ❓ multiple-choice questions
+src/progress.ts         📓 saves what you have done in your home folder
+src/doctor.ts           🩺 the setup check
 src/labs.ts             🚪 only opens programs inside labs/
 labs/                   🏋️ practice programs (source only; build them yourself)
 test/                   ✅ smoke tests with a fake REA + optimizer tests
@@ -113,8 +134,8 @@ skills/                 📚 the two teaching skills (plain Markdown)
 
 ## Roadmap
 
-- [ ] Guided lessons with quizzes and saved progress
-- [ ] More labs (logic branches, simple encodings)
+- [x] Guided lessons with quizzes and saved progress
+- [x] More labs (numbers, letters, a simple XOR disguise)
 - [x] `npx revelen` package
 - [x] Claude Code plugin with two skills
 

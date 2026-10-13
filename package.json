@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/index.ts",
-    "test": "npm run build && node --test test/optimizer.test.mjs && node test/smoke.mjs",
+    "test": "npm run build && node --test test/optimizer.test.mjs test/tutor.test.mjs && node test/smoke.mjs",
     "prepublishOnly": "npm test"
   },
   "license": "MIT",

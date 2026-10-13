@@ -80,4 +80,57 @@ export const CONCEPTS: Record<string, Concept> = {
     analogy: "Like going back to your bookmark after the footnote.",
     example: "ret",
   },
+  add: {
+    name: "ADD",
+    short: "Adds the right value to the left one and keeps the result in the left one.",
+    analogy: "Like dropping more coins into a jar: the jar now holds the total.",
+    example: "add rax, 1   ; rax is now one bigger. On an address: 'move to the next letter'",
+  },
+  sub: {
+    name: "SUB",
+    short: "Subtracts the right value from the left one and keeps the result in the left one.",
+    analogy: "Like taking coins out of a jar.",
+    example: "sub rsp, 0x20   ; make room on the stack for this function's notes",
+  },
+  xor: {
+    name: "XOR",
+    short: "Compares two values bit by bit: where the bits differ the result is 1, where they match it is 0. Doing the same XOR twice gives back the original.",
+    analogy: "Like a light with two switches: flip one and the light changes, flip the same one again and it is back as it was.",
+    example: "xor eax, 5     ; scramble eax with the key 5 (xor with 5 again to unscramble)\nxor eax, eax   ; a value XORed with itself is 0: a short way to write 'eax = 0'",
+  },
+  movzx: {
+    name: "MOVZX / MOVSX",
+    short: "Copies a small value (like one letter) into a bigger register and fills the extra room. MOVZX fills it with zeros; MOVSX keeps the sign.",
+    analogy: "Like moving one small item into a big box and stuffing the empty space with paper so nothing old is left inside.",
+    example: "movzx eax, byte ptr [rax]   ; take ONE letter from the text that rax points to",
+  },
+  hex: {
+    name: "Hexadecimal (0x...)",
+    short: "A way of writing numbers with 16 digits (0-9 then a-f) instead of 10. '0x' in front means 'this is hexadecimal'.",
+    analogy: "Like counting eggs in boxes of 16 instead of 10: 0x10 is one full box and no loose eggs, so 16.",
+    example: "cmp eax, 0x1f   ; 0x1f = 1 box of sixteen + 15 loose = 31",
+  },
+  ascii: {
+    name: "ASCII (letters as numbers)",
+    short: "The table that gives every letter a number, because a computer stores only numbers. 'a' is 0x61, 'b' is 0x62, and so on up to 'z' at 0x7a.",
+    analogy: "Like a secret-decoder ring where every letter has a fixed number.",
+    example: "cmp al, 0x68   ; is this letter 'h'?  (0x61=a ... 0x68=h)",
+  },
 };
+
+// Other names learners may type for the same card.
+const ALIASES: Record<string, string> = {
+  je: "jz",
+  jne: "jnz",
+  movsx: "movzx",
+  hexadecimal: "hex",
+  "0x": "hex",
+};
+
+// Find a card by name, ignoring capitals and spaces, and accepting the other names above.
+export function findConcept(name: string): { key: string; card: Concept } | undefined {
+  const typed = name.trim().toLowerCase();
+  const key = ALIASES[typed] ?? typed;
+  const card = CONCEPTS[key];
+  return card ? { key, card } : undefined;
+}
