@@ -12,6 +12,7 @@ export interface Progress {
   labsSolved: string[]; // lab names
   conceptsSeen: string[]; // lesson cards the learner has read
   quizzesPassed: string[]; // quiz ids answered correctly
+  webLessonsSolved: string[]; // web lessons solved, as "lesson@lab"
 }
 
 // REVELEN_HOME lets the tests write to a throwaway folder instead of the real diary.
@@ -34,6 +35,7 @@ export function loadProgress(): Progress {
     labsSolved: onlyStrings(saved?.labsSolved),
     conceptsSeen: onlyStrings(saved?.conceptsSeen),
     quizzesPassed: onlyStrings(saved?.quizzesPassed),
+    webLessonsSolved: onlyStrings(saved?.webLessonsSolved),
   };
 }
 

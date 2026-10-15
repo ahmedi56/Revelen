@@ -40,6 +40,23 @@ Claude / Cursor ──► Revelen (MCP) ──► REA ──► Ghidra ──►
 
 Your progress (labs solved, lesson cards read, quiz questions passed) is saved in `.revelen\progress.json` in your home folder.
 
+## Web labs (new in 0.5.0)
+
+Investigate how a public website behaves, from the evidence of one browser visit:
+
+| Tool | What it does |
+|---|---|
+| `revelen_start_web_lab` | Visits one public address once, in an isolated read-only Chromium, records its requests (secrets removed), then closes the browser |
+| `revelen_get_network_timeline` | The requests in order: number, method, status, type, address, size, time |
+| `revelen_inspect_request` | One request in detail, with a short cleaned preview of small text or JSON answers |
+| `revelen_list_evidence` | The evidence, labelled observed, interpretation, hypothesis or unknown |
+| `revelen_web_hint` / `revelen_web_answer` | The first lesson's graded hints, and an answer check made from the evidence |
+| `revelen_web_progress` / `revelen_stop_web_lab` | List saved labs to resume one, or delete one |
+
+Web labs need Playwright's Chromium once: `npx playwright install chromium`. Binary labs work without it.
+They refuse local and private addresses (checked on every connection, not just the first), never send forms or log in, and keep no cookies or tokens.
+Design, security limits and measurements: [docs/web-labs.md](docs/web-labs.md).
+
 ## Token savings
 
 Revelen's optimizer folds standard prologue/epilogue code, shortens addresses to offsets and labels known addresses. It never removes logic (compares, tests, calls, jumps).
@@ -126,6 +143,7 @@ src/tutor/lessons.ts    🗺️ the labs in order, with answer fingerprints (nev
 src/tutor/quizzes.ts    ❓ multiple-choice questions
 src/progress.ts         📓 saves what you have done in your home folder
 src/doctor.ts           🩺 the setup check
+src/web/                🌐 web labs: policy, egress proxy, capture, cleaning, evidence, lesson, store, tools
 src/labs.ts             🚪 only opens programs inside labs/
 labs/                   🏋️ practice programs (source only; build them yourself)
 test/                   ✅ smoke tests with a fake REA + optimizer tests

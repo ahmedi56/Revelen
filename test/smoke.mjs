@@ -36,14 +36,23 @@ assert.deepEqual(tools, [
   "revelen_answer_quiz",
   "revelen_check_setup",
   "revelen_check_solution",
+  "revelen_compare_network_activity",
   "revelen_explain_concept",
   "revelen_find_strings",
   "revelen_progress",
   "revelen_quiz",
+  "revelen_get_network_timeline",
+  "revelen_inspect_request",
+  "revelen_list_evidence",
   "revelen_show_function",
+  "revelen_start_web_lab",
+  "revelen_stop_web_lab",
   "revelen_story",
-]);
-console.log("✓ 9 tools listed");
+  "revelen_web_answer",
+  "revelen_web_hint",
+  "revelen_web_progress",
+].sort());
+console.log("✓ 18 tools listed (9 binary-lab tools, 9 web-lab tools)");
 
 const situation = text(await call("revelen_story", { lab: "level1_strings" }));
 assert.match(situation, /5 steps/);

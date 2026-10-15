@@ -14,6 +14,7 @@ import { searchStrings, readInstructions, ReaError, explainReaError } from "./br
 import { checkSetup } from "./doctor.js";
 import { labPath } from "./labs.js";
 import { compactFunction } from "./optimizer/compact.js";
+import { registerWebTools } from "./web/tools.js";
 
 // Revelen's short-term memory: clues found with find_strings, per lab.
 // Example: clues["level1_strings"]["0x140005050"] = 'string "revelen-rocks"'
@@ -159,7 +160,7 @@ server.registerTool(
   },
   async () => {
     try {
-      return { content: [{ type: "text", text: checkSetup() }] };
+      return { content: [{ type: "text", text: await checkSetup() }] };
     } catch (err) {
       return errorResult(err);
     }
@@ -365,7 +366,10 @@ server.registerTool(
   }
 );
 
-// 12. Connect to Claude through stdin/stdout.
+// 12. The web lab tools: investigate how a public website behaves (see src/web/).
+registerWebTools(server);
+
+// 13. Connect to Claude through stdin/stdout.
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);

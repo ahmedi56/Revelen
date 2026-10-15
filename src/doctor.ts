@@ -115,8 +115,24 @@ function checkLabs(): Check[] {
   });
 }
 
-export function checkSetup(): string {
-  const checks = [checkNode(), checkRea(), checkGhidra(), checkProvider(), checkJava(), checkGcc(), ...checkLabs()];
+// Web labs need Playwright and its own copy of Chromium. Binary labs work without them.
+async function checkWebLabs(): Promise<Check> {
+  try {
+    const { chromium } = await import("playwright");
+    const ok = existsSync(chromium.executablePath());
+    return {
+      ok,
+      name: "Chromium for web labs",
+      detail: ok ? "installed" : "Playwright is here, but its Chromium is not downloaded",
+      fix: "npx playwright install chromium",
+    };
+  } catch {
+    return { ok: false, name: "Chromium for web labs", detail: "Playwright is not installed", fix: "npm install playwright, then: npx playwright install chromium" };
+  }
+}
+
+export async function checkSetup(): Promise<string> {
+  const checks = [checkNode(), checkRea(), checkGhidra(), checkProvider(), checkJava(), checkGcc(), ...checkLabs(), await checkWebLabs()];
   const ready = checks.filter((c) => c.ok).length;
   const lines = checks.map((c) =>
     c.ok ? `✅ ${c.name}: ${c.detail}` : `❌ ${c.name}: ${c.detail}\n   Fix: ${c.fix}`
