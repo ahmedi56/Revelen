@@ -2,7 +2,8 @@
 
 Web labs let a learner investigate how a public website behaves, from the
 evidence one browser visit leaves behind, with a tutor that teaches instead of
-reporting. This document covers the first vertical slice (Revelen 0.5.0).
+reporting. This document covers the first vertical slice (Revelen 0.5.0) and
+the before-and-after comparisons added in 0.6.0 (section 2a).
 
 ## 1. Repository audit (before this work)
 
@@ -64,6 +65,33 @@ which is also what makes a lab resumable.
 | M. Security policy | `policy.ts`, `egressProxy.ts`, `redact.ts`, read-only rule in `capture.ts` |
 | N. Tests and diagnostics | `test/web-unit.test.mjs`, `test/web/`, `revelen_check_setup` |
 
+## 2a. Before and after one action (0.6.0)
+
+`revelen_compare_network_activity` answers "what did this button do?".
+
+1. On the first visit, `capture.ts` lists what can be tried on the page
+   (`findActions`): visible buttons, links and search or text boxes. It leaves
+   out password, e-mail and phone boxes, disabled buttons, buttons that submit a
+   POST form, and download, `javascript:`, `mailto:` and `tel:` links.
+2. Called without an action, the tool shows that list (as untrusted page data).
+3. Called with one action (`a3`, plus words for a box), it visits the page
+   again in a fresh browser, does that one thing (click, or type at most 60
+   characters and press Enter), waits 2.5 seconds, and closes the browser.
+   Before clicking it checks that the element still has the same text; if the
+   page changed since the first visit, it refuses rather than click something else.
+4. The requests are split at the moment of the action. "New" means the same
+   method, type and cleaned address did not appear before the action.
+5. `compare.ts` turns this into evidence: what was observed (requests after,
+   text length before and after, address change), an interpretation only when a
+   new data request AND a visible change happened together, a hypothesis when
+   only one of them did, and always the unknown: coming after an action is not
+   proof of coming from it, because pages also make requests on timers.
+6. A second lesson ("web-2-action-effect") opens once the first one is solved:
+   which new request brought the content, or "none" when the page changed on
+   its own. `revelen_web_hint` and `revelen_web_answer` follow whichever
+   question is open. Each lab keeps its newest 5 comparisons; labs saved by
+   0.5.0 still load (the new fields are optional).
+
 ## 3. Security
 
 ### What is enforced, and how it is tested
@@ -79,6 +107,8 @@ which is also what makes a lab resumable.
 | No downloads, permissions, service workers | browser context options | by configuration |
 | Secrets are never kept | addresses cleaned, only a short list of harmless headers kept, JSON/text previews cleaned and capped at 1,500 characters, nothing over 64 KB previewed | unit and browser: cookie, token, API key and e-mail absent from the record |
 | Website text cannot steer the tutor | all website-derived text is control-character-stripped, length-capped and wrapped in UNTRUSTED PAGE DATA markers; the skill tells the tutor never to follow it | by construction; not testable against every possible injection |
+| Actions stay harmless: one action per visit, only from the list the lab made itself, read-only rule still on, pop-up windows closed, alert/confirm boxes dismissed | `perform` in `capture.ts` | browser: clicking a link to the private service leaves it with zero requests |
+| Nothing personal is typed | at most 60 characters; e-mail addresses, long numbers and password-like words refused; password, e-mail and phone boxes never listed | browser: typing an e-mail address is refused |
 | Limits | 25 s navigation, 300 requests kept, 2 labs at once, browser closed after each visit, 20 saved labs | by configuration |
 | No path tricks on saved labs | lab ids must match `w-` + 8 hex characters before they touch the disk | by construction |
 
@@ -116,8 +146,16 @@ What this shows: plain HTML, a modern JavaScript site and a WordPress site can
 all be visited and recorded. It does not show that every site works: sites
 behind logins, sites that block automated browsers, sites on unusual ports,
 and sites that need WebSockets for their content are not supported or not
-tested. Single-page apps that load content only after clicks need the
-before-and-after comparison, which is not built yet.
+tested. Single-page apps that load content only after clicks can now be
+studied with the before-and-after comparison (0.6.0). Tested on the local test
+site (a button that fetches reviews, a search box, a button that changes the
+page without a request, a link to a private address) and on two real sites on
+2026-10-15:
+
+| Site | Actions listed | Action tried | Result | Time |
+|---|---|---|---|---|
+| example.com | 1 | link "Learn more" | 9 requests after it: a 301 redirect, then the new page (iana.org) and its files; address changed | 6,411 ms |
+| vuejs.org | 25 | the search button | 1 new request: the search box's script, loaded only when asked for | 6,464 ms |
 
 Every visit costs about 2 seconds of fixed time (browser start, plus the 2
 seconds of waiting after load). The memory of the measuring process grew by
@@ -146,13 +184,20 @@ tests for vulnerabilities.
 4. Playwright and Chromium are a large download (about 150 MB) that `npx revelen`
    users must run once; binary labs keep working without it.
 5. Request initiators (which script started a request) are not captured, so
-   the tutor cannot yet connect a request to the code that made it.
+   the tutor cannot yet connect a request to the code that made it. This is
+   also why a comparison can only say a request came AFTER an action.
+6. A comparison is a second visit: a page that shows different content each
+   time (adverts, rotating items) can make "new" requests that have nothing to
+   do with the action. The evidence states this limit.
+7. A button on a real site can do things the lab cannot see coming, for
+   example start a GET request that changes something on a badly built server.
+   The read-only rule stops POST, PUT and DELETE, not a careless GET.
 
 ## 7. Backlog and next releases
 
 | Release | Content | Why in this order |
 |---|---|---|
-| 0.6 | `revelen_compare_network_activity`: approved clicks on a still-open page, before-and-after timelines | the spec's MVP priority, and the way to test hypotheses |
+| 0.6 (done) | `revelen_compare_network_activity`: one listed click or search per fresh visit, before-and-after timelines, second lesson | the spec's MVP priority, and the way to test hypotheses |
 | 0.7 | `revelen_inspect_page_structure`: headings, landmarks, forms (read-only), scripts and styles listed | turns "what loaded" into "what it built" |
 | 0.8 | request initiators through the Chrome DevTools Protocol, fingerprints with stated confidence | lets the tutor connect a request to its script |
 | 0.9 | more lessons (caching, third-party hosts, failed requests), shared quiz engine with binary labs | content, once the evidence is rich enough |

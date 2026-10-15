@@ -40,7 +40,7 @@ Claude / Cursor ──► Revelen (MCP) ──► REA ──► Ghidra ──►
 
 Your progress (labs solved, lesson cards read, quiz questions passed) is saved in `.revelen\progress.json` in your home folder.
 
-## Web labs (new in 0.5.0)
+## Web labs (new in 0.5.0, comparisons in 0.6.0)
 
 Investigate how a public website behaves, from the evidence of one browser visit:
 
@@ -50,7 +50,8 @@ Investigate how a public website behaves, from the evidence of one browser visit
 | `revelen_get_network_timeline` | The requests in order: number, method, status, type, address, size, time |
 | `revelen_inspect_request` | One request in detail, with a short cleaned preview of small text or JSON answers |
 | `revelen_list_evidence` | The evidence, labelled observed, interpretation, hypothesis or unknown |
-| `revelen_web_hint` / `revelen_web_answer` | The first lesson's graded hints, and an answer check made from the evidence |
+| `revelen_compare_network_activity` | Lists what can be clicked or searched on the page; then repeats the visit, does one of those things, and shows which requests came after it |
+| `revelen_web_hint` / `revelen_web_answer` | Graded hints for the open lesson (where the page comes from, then what an action asked for), and an answer check made from the evidence |
 | `revelen_web_progress` / `revelen_stop_web_lab` | List saved labs to resume one, or delete one |
 
 Web labs need Playwright's Chromium once: `npx playwright install chromium`. Binary labs work without it.

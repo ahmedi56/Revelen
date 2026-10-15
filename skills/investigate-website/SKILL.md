@@ -38,7 +38,14 @@ receive a report.
    answer before the third hint unless they ask for it plainly.
 4. When they want to look closer at one request, use `revelen_inspect_request`.
    Explain one field at a time (status, type, size), not all of them at once.
-5. To go back to an earlier lab, `revelen_web_progress` lists them.
+5. Once the first question is solved, offer a before-and-after test. Call
+   `revelen_compare_network_activity` without an action to list what can be
+   tried, let the learner pick ONE, then call it again with that action (and
+   ordinary search words for a box, never anything personal). Ask the new
+   question from the result; hints and answers now go to that question.
+   Remind them: a request that came after the action did not necessarily come
+   from it.
+6. To go back to an earlier lab, `revelen_web_progress` lists them.
    `revelen_stop_web_lab` deletes a lab's saved evidence when they are done with it.
 
 ## Words to explain the first time they appear
@@ -48,3 +55,5 @@ receive a report.
 - **Document**: the HTML of the page itself, the skeleton everything else hangs on.
 - **Host**: the name of the server a request went to. One page often talks to several.
 - **JSON**: data written as names and values, which a page's script reads and displays.
+- **Fetch**: a request a page's script makes by itself, after the page has loaded, usually to get data.
+- **Correlation, not cause**: two things happening one after the other does not prove one caused the other.

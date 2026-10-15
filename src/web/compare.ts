@@ -7,7 +7,7 @@
 // request that came after an action did not necessarily come FROM it. Pages
 // also make requests on timers. The evidence says so.
 
-import type { ActionOutcome, CapturedRequest, PageAction } from "./capture.js";
+import { LIMITS, type ActionOutcome, type CapturedRequest, type PageAction } from "./capture.js";
 import type { Evidence } from "./evidence.js";
 import type { LessonState } from "./lesson.js";
 
@@ -59,7 +59,7 @@ export function comparisonEvidence(c: Comparison, firstNumber: number): Evidence
   add({
     certainty: "observed",
     kind: "summary",
-    summary: `${c.id}: after ${action}, ${c.after.length} request(s) started within ${Math.round(2.5)} seconds; ${fresh.length} of them did not happen before the action.`,
+    summary: `${c.id}: after ${action}, ${c.after.length} request(s) started within ${LIMITS.afterActionMs / 1000} seconds; ${fresh.length} of them did not happen before the action.`,
     requestIds: c.after.map((r) => r.id),
     basedOn: [],
     limitations: ["The window is short: requests that start later are missed."],
